@@ -30,7 +30,7 @@ export const config: SiteConfig = {
     linkedin: "https://linkedin.com/in/yourusername",
     email: "your.email@example.com"
   },
-  siteUrl: "https://volks-typo.example.com"
+  siteUrl: "https://blog.nurarif.com"
 };
 
 // Export constants for SEO component
