@@ -58,7 +58,7 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
         {frontmatter.categories && frontmatter.categories.length > 0 && (
           <div class="post-categories">
             {frontmatter.categories.map((category: string) => (
-              <a href={`${base}/categories/${category.toLowerCase()}`} class="category-tag">
+              <a href={`${base}categories/${category.toLowerCase()}`} class="category-tag">
                 {category}
               </a>
             ))}
@@ -93,7 +93,7 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
       )}
       
       <div class="post-navigation">
-        <a href={`${base}/blog`} class="back-to-blog">← Back to Blog</a>
+        <a href={`${base}blog`} class="back-to-blog">← Back to Blog</a>
       </div>
     </footer>
   </article>

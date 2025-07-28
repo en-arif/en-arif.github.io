@@ -4,7 +4,7 @@ import Layout from '../components/Layout.astro';
 const base = import.meta.env.BASE_URL;
 
 // Get all blog posts
-const postsGlob = import.meta.glob('../content/blog/*.md', { eager: true });
+const postsGlob = import.meta.glob('../content/blog/*.{md,mdx}', { eager: true });
 const allPosts = Object.values(postsGlob) as any[];
 
 // Extract all categories from posts
