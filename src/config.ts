@@ -17,18 +17,18 @@ export interface SiteConfig {
 }
 
 export const config: SiteConfig = {
-  title: "Volks-Typo",
-  description: "A blog exploring the intersection of design, typography, and history",
+  title: "NUR ARIF",
+  description: "Programmer From Indonesia",
   author: {
-    name: "Your Name",
-    bio: "Writer, designer, and explorer of aesthetic tensions between past and present.",
-    // avatar: "/images/avatar.jpg" // Uncomment and add your avatar image to public/images/
+    name: "Nur Arif",
+    bio: "Cyber Security Specialist | Pentester | Backend | Reverse Engineer | Python Programming",
+    avatar: "/favicon.svg" // Uncomment and add your avatar image to public/images/
   },
   social: {
-    github: "https://github.com/yourusername",
-    twitter: "https://twitter.com/yourusername",
-    linkedin: "https://linkedin.com/in/yourusername",
-    email: "your.email@example.com"
+    github: "https://github.com/ArN-1",
+    twitter: "https://x.com/arifnrrrrr",
+    linkedin: "https://www.linkedin.com/in/nur-arif-8b6a521a4/",
+    email: "nurarifdev@gmail.com"
   },
   siteUrl: "https://blog.nurarif.com"
 };
