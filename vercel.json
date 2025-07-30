@@ -1,15 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "redirects": [
     {
       "source": "/(.*)",
       "has": [
         {
           "type": "host",
-          "value": "writeup-nurarif151s-projects.vercel.app/"
+          "value": "writeup-nurarif151s-projects.vercel.app"
         }
       ],
       "destination": "https://blog.nurarif.com/:1",
-      "permanent": true
+      "statusCode": 308
     }
   ]
 }
