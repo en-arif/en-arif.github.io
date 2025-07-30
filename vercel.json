@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "writeup-nurarif151s-projects.vercel.app/"
+        }
+      ],
+      "destination": "https://blog.nurarif.com/:1",
+      "permanent": true
+    }
+  ]
+}
