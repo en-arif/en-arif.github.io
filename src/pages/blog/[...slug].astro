@@ -3,34 +3,32 @@ import Layout from '../../components/Layout.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
 import { extractHeadings, filterHeadingsForTOC } from '../../utils/table-of-contents';
 import { calculateReadingTime, extractTextFromMarkdown } from '../../utils/reading-time';
+import { getCollection } from 'astro:content';
+import { config } from '../../config';
 
 export async function getStaticPaths() {
-  // Support both .md and .mdx files
-  const mdPostsGlob = import.meta.glob('../../content/blog/*.md', { eager: true });
-  const mdxPostsGlob = import.meta.glob('../../content/blog/*.mdx', { eager: true });
-  
-  const allPosts = [...Object.values(mdPostsGlob), ...Object.values(mdxPostsGlob)] as any[];
-  
-  return allPosts.map((post: any) => {
-    // For import.meta.glob, access raw content through compiledContent or body
-    const rawContent = post.body || post.rawContent?.() || '';
+  const posts = await getCollection('blog');
+
+  return posts.map((post) => {
+    const rawContent = post.body ?? '';
     const plainText = extractTextFromMarkdown(rawContent);
     const readingTime = calculateReadingTime(plainText);
     const allHeadings = extractHeadings(rawContent);
     const tocHeadings = filterHeadingsForTOC(allHeadings);
-    
+
     return {
-      params: { slug: post.file.split('/').pop()?.replace(/\.(md|mdx)$/, '') },
+      params: { slug: post.slug },
       props: { post, readingTime, tocHeadings }
     };
   });
 }
 
 const { post, readingTime, tocHeadings } = Astro.props;
-const { frontmatter, Content } = post as any;
+const { Content } = await post.render();
+const frontmatter = post.data;
 
 const pageTitle = frontmatter.title;
-const base = import.meta.env.BASE_URL;
+const base = config.siteUrl;
 const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString() : undefined;
 ---
 
@@ -39,44 +37,45 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
   description={frontmatter.description || frontmatter.excerpt}
   type="article"
   publishedTime={publishedTime}
+  showSidebar={false}
 >
   <article class="blog-post">
     <header class="post-header">
       <h1 class="post-title">{frontmatter.title}</h1>
-      
+
       <div class="post-meta">
-        <time class="post-date" datetime={frontmatter.date}>
+        <time class="post-date" datetime={frontmatter.date?.toISOString()}>
           {new Date(frontmatter.date).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
           })}
         </time>
-        
+
         <span class="post-reading-time">{readingTime}</span>
-        
+
         {frontmatter.categories && frontmatter.categories.length > 0 && (
           <div class="post-categories">
             {frontmatter.categories.map((category: string) => (
-              <a href={`${base}categories/${category.toLowerCase()}`} class="category-tag">
+              <a href={`${base}/categories/${category.toLowerCase()}`} class="category-tag">
                 {category}
               </a>
             ))}
           </div>
         )}
       </div>
-      
+
       {frontmatter.excerpt && (
         <p class="post-excerpt">{frontmatter.excerpt}</p>
       )}
-      
-      <!-- Monumental Blood Red Rule -->
+
       <hr class="monumental-rule" />
     </header>
 
-    <TableOfContents headings={tocHeadings} />
 
     <div class="post-content">
+          <TableOfContents headings={tocHeadings} />
+
       <Content />
     </div>
 
@@ -91,10 +90,11 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
           </div>
         </div>
       )}
-      
+
       <div class="post-navigation">
-        <a href={`${base}blog`} class="back-to-blog">← Back to Blog</a>
+        <a href={`${base}/blog`} class="back-to-blog">← Back to Blog</a>
       </div>
+
     </footer>
   </article>
 </Layout>
@@ -173,7 +173,6 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
     text-decoration: none;
   }
 
-  /* Dark mode category tag styles */
   :global([data-theme="dark"]) .category-tag {
     background-color: var(--color-surface);
     color: var(--color-text-primary);
@@ -276,14 +275,11 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
     font-size: inherit;
   }
 
-  /* Custom Prism syntax highlighting for German flag colors */
-  /* CSS selectors like h1 - use gold */
   .post-content :global(.token.selector),
   .post-content :global(.token.tag) {
     color: #ffd700 !important;
   }
 
-  /* CSS properties and functions - use red */
   .post-content :global(.token.property),
   .post-content :global(.token.class-name),
   .post-content :global(.token.function) {
@@ -312,7 +308,6 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
     color: #66d9ef !important;
   }
 
-  /* Reset default Prism styles and apply our theme */
   .post-content :global(pre[class*="language-"]) {
     background: #000000 !important;
     color: #ffffff !important;
@@ -440,4 +435,6 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
       font-size: 1rem;
     }
   }
+
+  
 </style>
