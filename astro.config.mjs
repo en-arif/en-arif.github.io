@@ -4,7 +4,8 @@ import mdx from '@astrojs/mdx';
 
 export default defineConfig({
   site: 'https://www.nurarif.com',
-  base: undefined,
+  output: 'static',
+  trailingSlash: 'always',
   integrations: [mdx()],
   markdown: {
     shikiConfig: {
