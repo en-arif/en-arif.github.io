@@ -1,11 +1,9 @@
 ---
 import { config } from '../config';
-const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: '' };
 ---
 
 <header class="site-header">
   <div class="header-content">
-    <!-- Mobile hamburger button - far left on mobile -->
     <button class="hamburger-toggle mobile-only" id="hamburger-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path class="hamburger-line" d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -15,27 +13,23 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     </button>
     
     <div class="site-title">
-      <a href={base}>
-        <img src={base + "arif.png"} alt={config.title} class="title-svg" />
+      <a href="/">
+        <img src="/arif.png" alt={config.title} class="title-svg" />
       </a>
     </div>
     
     <div class="header-controls">
       <nav class="main-navigation" role="navigation" aria-label="Main navigation">
         <ul class="nav-list">
-          <li><a href={base} class="nav-link">Home</a></li>
-          <li><a href={base + "blog"} class="nav-link">Blog</a></li>
-          <li><a href={base + "categories"} class="nav-link">Categories</a></li>
-          <li><a href="https://www.nurarif.com/" target="_blank" class="nav-link">About</a></li>
+          <li><a href="/" class="nav-link">Home</a></li>
+          <li><a href="/blog/" class="nav-link">Blog</a></li>
+          <li><a href="/categories/" class="nav-link">Categories</a></li>
+          <li><a href="/about/" class="nav-link">About</a></li>
         </ul>
       </nav>
       
-      <!-- Mobile controls group - RSS and Search on right -->
       <div class="mobile-controls">
-        
-       
-        
-        <a href={base + "rss.xml"} class="rss-toggle" title="RSS Feed">
+        <a href="/rss.xml" class="rss-toggle" title="RSS Feed">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="5" cy="19" r="2" fill="currentColor"/>
             <path d="M3 3v2c8.284 0 15 6.716 15 15h2c0-9.389-7.611-17-17-17z" fill="currentColor"/>
@@ -57,10 +51,10 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
 
 <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
   <ul class="mobile-nav-list">
-    <li><a href={base} class="mobile-nav-link">Home</a></li>
-    <li><a href={base + "blog"} class="mobile-nav-link">Blog</a></li>
-    <li><a href={base + "categories"} class="mobile-nav-link">Categories</a></li>
-    <li><a href={base + "about"} class="mobile-nav-link">About</a></li>
+    <li><a href="/" class="mobile-nav-link">Home</a></li>
+    <li><a href="/blog/" class="mobile-nav-link">Blog</a></li>
+    <li><a href="/categories/" class="mobile-nav-link">Categories</a></li>
+    <li><a href="/about/" class="mobile-nav-link">About</a></li>
   </ul>
 </nav>
 
@@ -80,8 +74,39 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
 </div>
 
 <script>
-  const base = `${import.meta.env.BASE_URL || ''}`;
-  
+  // Search functionality
+  let searchData: any[] = [];
+  let searchOverlay: HTMLElement | null, searchInput: HTMLInputElement | null, searchResults: HTMLElement | null;
+
+  async function initSearch() {
+    try {
+      const response = await fetch('/search.json');
+      searchData = await response.json();
+    } catch (error) {
+      console.error('Failed to load search data:', error);
+    }
+
+    searchOverlay = document.getElementById('search-overlay');
+    searchInput = document.getElementById('search-input') as HTMLInputElement;
+    searchResults = document.getElementById('search-results');
+
+    document.getElementById('search-toggle')?.addEventListener('click', openSearch);
+    document.getElementById('search-close')?.addEventListener('click', closeSearch);
+    searchInput?.addEventListener('input', handleSearch);
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchOverlay?.classList.contains('active')) {
+        closeSearch();
+      }
+    });
+    
+    searchOverlay?.addEventListener('click', (e: Event) => {
+      if (e.target === searchOverlay) {
+        closeSearch();
+      }
+    });
+  }
+
   // Hamburger menu functionality
   function initHamburgerMenu() {
     const hamburgerToggle = document.getElementById('hamburger-toggle');
@@ -92,7 +117,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
 
     hamburgerToggle.addEventListener('click', () => {
       const isOpen = mobileMenu.classList.contains('active');
-      
       if (isOpen) {
         mobileMenu.classList.remove('active');
         hamburgerToggle.setAttribute('aria-expanded', 'false');
@@ -104,7 +128,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
       }
     });
 
-    // Close menu when clicking on a link
     const mobileNavLinks = mobileMenu.querySelectorAll('.mobile-nav-link');
     mobileNavLinks.forEach(link => {
       link.addEventListener('click', () => {
@@ -114,48 +137,11 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
       });
     });
 
-    // Close menu on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
         mobileMenu.classList.remove('active');
         hamburgerToggle.setAttribute('aria-expanded', 'false');
         body.style.overflow = '';
-      }
-    });
-  }
-
-  // Search functionality
-  let searchData: any[] = [];
-  let searchOverlay: HTMLElement | null, searchInput: HTMLInputElement | null, searchResults: HTMLElement | null;
-
-  async function initSearch() {
-    try {
-      const response = await fetch(base + 'search.json');
-      searchData = await response.json();
-    } catch (error) {
-      console.error('Failed to load search data:', error);
-    }
-
-    searchOverlay = document.getElementById('search-overlay');
-    searchInput = document.getElementById('search-input') as HTMLInputElement;
-    searchResults = document.getElementById('search-results');
-
-    // Event listeners
-    document.getElementById('search-toggle')?.addEventListener('click', openSearch);
-    document.getElementById('search-close')?.addEventListener('click', closeSearch);
-    searchInput?.addEventListener('input', handleSearch);
-    
-    // Close on escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && searchOverlay?.classList.contains('active')) {
-        closeSearch();
-      }
-    });
-    
-    // Close on overlay click
-    searchOverlay?.addEventListener('click', (e: Event) => {
-      if (e.target === searchOverlay) {
-        closeSearch();
       }
     });
   }
@@ -206,7 +192,7 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     const resultsHTML = results.map((post: any) => `
       <article class="search-result">
         <h3 class="search-result-title">
-          <a href="${base}${post.url.startsWith('/') ? post.url.slice(1) : post.url}">${post.title}</a>
+          <a href="${post.url}">${post.title}</a>
         </h3>
         <time class="search-result-date">${new Date(post.date).toLocaleDateString('en-US', {
           year: 'numeric',
@@ -232,7 +218,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     }
   }
 
-  // Initialize when DOM is loaded
   function init() {
     initHamburgerMenu();
     initSearch();
@@ -275,8 +260,8 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     height: 48px;
     width: auto;
     max-width: 280px;
-    border: none !important; /* Override global img styles */
-    margin: 0 !important; /* Override global img styles */
+    border: none !important;
+    margin: 0 !important;
   }
 
   .header-controls {
@@ -480,8 +465,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     color: white;
   }
 
-  
-
   .search-no-results {
     padding: calc(var(--grid-unit) * 10) calc(var(--grid-unit) * 6);
     text-align: center;
@@ -524,12 +507,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     text-decoration: none;
   }
 
-  .rss-link {
-    display: flex;
-    align-items: center;
-    gap: calc(var(--grid-unit) / 2);
-  }
-
   .visually-hidden {
     position: absolute;
     width: 1px;
@@ -542,14 +519,12 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     border: 0;
   }
 
-  /* Desktop controls - visible by default */
   .mobile-controls {
     display: flex;
     align-items: center;
     gap: calc(var(--grid-unit) * 2);
   }
 
-  /* Hide mobile-only hamburger by default */
   .mobile-only {
     display: none !important;
   }
@@ -578,39 +553,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     justify-content: center;
     text-decoration: none;
   }
-  
-  .github-star-button {
-    background: none;
-    border: 2px solid var(--color-accent);
-    color: var(--color-accent);
-    padding: calc(var(--grid-unit) * 0.75) calc(var(--grid-unit) * 2);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: calc(var(--grid-unit));
-    text-decoration: none;
-    font-family: var(--font-heading-secondary);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.875rem;
-    border-radius: 4px;
-  }
-  
-  .github-star-button:hover,
-  .github-star-button:focus {
-    background-color: var(--color-accent);
-    color: var(--color-background);
-    outline: none;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .github-star-text {
-    display: inline-block;
-  }
 
   .hamburger-toggle:hover,
   .hamburger-toggle:focus,
@@ -620,7 +562,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     outline: none;
   }
 
-  /* Mobile menu - hidden by default */
   .mobile-menu {
     position: fixed;
     top: 0;
@@ -678,7 +619,6 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
       padding: 0 calc(var(--grid-unit) * 2);
     }
 
-    /* Show mobile hamburger on far left */
     .mobile-only {
       display: flex !important;
       justify-self: start;
@@ -687,7 +627,7 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     .site-title {
       justify-self: center;
       text-align: center;
-      grid-column: 2; /* Explicitly place in center column */
+      grid-column: 2;
     }
 
     .site-title a {
@@ -703,15 +643,13 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     .header-controls {
       justify-self: end;
       gap: 0;
-      grid-column: 3; /* Explicitly place in right column */
+      grid-column: 3;
     }
     
-    /* Hide desktop navigation on mobile */
     .main-navigation {
       display: none;
     }
     
-    /* Show mobile controls on right */
     .mobile-controls {
       display: flex !important;
       gap: calc(var(--grid-unit) * 1.5);
@@ -741,45 +679,13 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
       padding: calc(var(--grid-unit) * 2) calc(var(--grid-unit) * 2.5);
       margin: calc(var(--grid-unit) * -2) calc(var(--grid-unit) * -2.5) calc(var(--grid-unit) * 2) calc(var(--grid-unit) * -2.5);
     }
-    
-    .search-result-categories {
-      gap: calc(var(--grid-unit) * 2);
-    }
-    
-    .search-category {
-      padding: calc(var(--grid-unit)) calc(var(--grid-unit) * 2);
-    }
-    
-    .search-result-title {
-      margin-bottom: calc(var(--grid-unit) * 2);
-    }
-    
-    .search-result-date {
-      margin-bottom: calc(var(--grid-unit) * 3);
-    }
-    
-    .search-result-excerpt {
-      margin-bottom: calc(var(--grid-unit) * 4);
-    }
-    
-    /* Adjust GitHub button for mobile */
-    .github-star-button {
-      padding: calc(var(--grid-unit) * 0.75);
-      border-width: 1px;
-    }
-    
-    .github-star-text {
-      display: none;
-    }
   }
   
   @media (max-width: 480px) {
-    /* Even smaller mobile adjustments */
     .mobile-controls {
       gap: calc(var(--grid-unit)) !important;
     }
     
-    .github-star-button,
     .rss-toggle,
     .search-toggle {
       padding: calc(var(--grid-unit) * 0.5);
