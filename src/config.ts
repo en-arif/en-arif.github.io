@@ -31,7 +31,7 @@ export const config: SiteConfig = {
     linkedin: "https://www.linkedin.com/in/nur-arif-8b6a521a4/",
     email: "mailto:nurarifdev@gmail.com", // tambah mailto: agar bisa langsung jadi link
   },
-  siteUrl: "https://blog.nurarif.com",
+  siteUrl: "https://www.nurarif.com",
 };
 
 // Export constants untuk SEO component
