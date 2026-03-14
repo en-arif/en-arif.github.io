@@ -9,11 +9,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install
+
       - run: npm run build
+
+      - name: Fix GitHub Pages routing
+        run: |
+          find dist -mindepth 2 -name "index.html" | while read f; do
+            dir=$(dirname "$f")
+            name=$(basename "$dir")
+            parent=$(dirname "$dir")
+            cp "$f" "$parent/$name.html" 2>/dev/null || true
+          done
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
