@@ -5,7 +5,7 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   site: 'https://www.nurarif.com',
   output: 'static',
-  trailingSlash: 'ignore',
+  trailingSlash: 'always',   // ← ubah dari 'ignore' ke 'always'
   integrations: [mdx()],
   markdown: {
     shikiConfig: {
