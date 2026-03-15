@@ -5,7 +5,8 @@ import mdx from '@astrojs/mdx';
 export default defineConfig({
   site: process.env.SITE || 'https://www.nurarif.com',
   base: process.env.BASE_PATH || '/',
-  trailingSlash: 'always',   
+  trailingSlash: 'always',
+  // JANGAN tambahkan build.format: 'file' — hapus jika ada
   integrations: [mdx()],
   markdown: {
     shikiConfig: {
