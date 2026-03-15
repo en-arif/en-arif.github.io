@@ -1,9 +1,13 @@
 ---
 import { config } from '../config';
+import ThemeToggle from './ThemeToggle.astro';
+
+const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: '' };
 ---
 
 <header class="site-header">
   <div class="header-content">
+    <!-- Mobile hamburger button - far left on mobile -->
     <button class="hamburger-toggle mobile-only" id="hamburger-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path class="hamburger-line" d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -13,23 +17,32 @@ import { config } from '../config';
     </button>
     
     <div class="site-title">
-      <a href="/">
-        <img src="/arif.png" alt={config.title} class="title-svg" />
+      <a href={base}>
+        <img src={base + "site-title.svg"} alt={config.title} class="title-svg" />
       </a>
     </div>
     
     <div class="header-controls">
       <nav class="main-navigation" role="navigation" aria-label="Main navigation">
         <ul class="nav-list">
-          <li><a href="/" class="nav-link">Home</a></li>
-          <li><a href="/blog/" class="nav-link">Blog</a></li>
-          <li><a href="/categories/" class="nav-link">Categories</a></li>
-          <li><a href="/about/" class="nav-link">About</a></li>
+          <li><a href={base} class="nav-link">Home</a></li>
+          <li><a href={base + "blog"} class="nav-link">Blog</a></li>
+          <li><a href={base + "categories"} class="nav-link">Categories</a></li>
+          <li><a href={base + "about"} class="nav-link">About</a></li>
         </ul>
       </nav>
       
+      <!-- Mobile controls group - RSS and Search on right -->
       <div class="mobile-controls">
-        <a href="/rss.xml" class="rss-toggle" title="RSS Feed">
+        <ThemeToggle />
+        <a href="https://github.com/jdrhyne2/volks-typo" class="github-star-button" target="_blank" rel="noopener" title="Star on GitHub">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2C6.477 2 2 6.463 2 11.97c0 4.404 2.865 8.14 6.839 9.458.5.092.682-.216.682-.48 0-.236-.008-.864-.013-1.695-2.782.602-3.369-1.337-3.369-1.337-.454-1.151-1.11-1.458-1.11-1.458-.908-.618.069-.606.069-.606 1.003.07 1.531 1.027 1.531 1.027.892 1.524 2.341 1.084 2.91.828.092-.643.35-1.083.636-1.332-2.22-.251-4.555-1.107-4.555-4.927 0-1.088.39-1.979 1.029-2.675-.103-.252-.446-1.266.098-2.638 0 0 .84-.268 2.75 1.022A9.607 9.607 0 0112 6.82a9.55 9.55 0 012.504.336c1.909-1.29 2.747-1.022 2.747-1.022.546 1.372.202 2.386.1 2.638.64.696 1.028 1.587 1.028 2.675 0 3.83-2.339 4.673-4.566 4.92.359.307.678.915.678 1.846 0 1.332-.012 2.407-.012 2.734 0 .267.18.577.688.48 3.97-1.32 6.833-5.054 6.833-9.458C22 6.463 17.522 2 12 2z" fill="currentColor"/>
+          </svg>
+          <span class="github-star-text">Star</span>
+        </a>
+        
+        <a href={base + "rss.xml"} class="rss-toggle" title="RSS Feed">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <circle cx="5" cy="19" r="2" fill="currentColor"/>
             <path d="M3 3v2c8.284 0 15 6.716 15 15h2c0-9.389-7.611-17-17-17z" fill="currentColor"/>
@@ -51,10 +64,10 @@ import { config } from '../config';
 
 <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation">
   <ul class="mobile-nav-list">
-    <li><a href="/" class="mobile-nav-link">Home</a></li>
-    <li><a href="/blog/" class="mobile-nav-link">Blog</a></li>
-    <li><a href="/categories/" class="mobile-nav-link">Categories</a></li>
-    <li><a href="/about/" class="mobile-nav-link">About</a></li>
+    <li><a href={base} class="mobile-nav-link">Home</a></li>
+    <li><a href={base + "blog"} class="mobile-nav-link">Blog</a></li>
+    <li><a href={base + "categories"} class="mobile-nav-link">Categories</a></li>
+    <li><a href={base + "about"} class="mobile-nav-link">About</a></li>
   </ul>
 </nav>
 
@@ -74,39 +87,8 @@ import { config } from '../config';
 </div>
 
 <script>
-  // Search functionality
-  let searchData: any[] = [];
-  let searchOverlay: HTMLElement | null, searchInput: HTMLInputElement | null, searchResults: HTMLElement | null;
-
-  async function initSearch() {
-    try {
-      const response = await fetch('/search.json');
-      searchData = await response.json();
-    } catch (error) {
-      console.error('Failed to load search data:', error);
-    }
-
-    searchOverlay = document.getElementById('search-overlay');
-    searchInput = document.getElementById('search-input') as HTMLInputElement;
-    searchResults = document.getElementById('search-results');
-
-    document.getElementById('search-toggle')?.addEventListener('click', openSearch);
-    document.getElementById('search-close')?.addEventListener('click', closeSearch);
-    searchInput?.addEventListener('input', handleSearch);
-    
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && searchOverlay?.classList.contains('active')) {
-        closeSearch();
-      }
-    });
-    
-    searchOverlay?.addEventListener('click', (e: Event) => {
-      if (e.target === searchOverlay) {
-        closeSearch();
-      }
-    });
-  }
-
+  const base = `${import.meta.env.BASE_URL || ''}`;
+  
   // Hamburger menu functionality
   function initHamburgerMenu() {
     const hamburgerToggle = document.getElementById('hamburger-toggle');
@@ -117,6 +99,7 @@ import { config } from '../config';
 
     hamburgerToggle.addEventListener('click', () => {
       const isOpen = mobileMenu.classList.contains('active');
+      
       if (isOpen) {
         mobileMenu.classList.remove('active');
         hamburgerToggle.setAttribute('aria-expanded', 'false');
@@ -128,6 +111,7 @@ import { config } from '../config';
       }
     });
 
+    // Close menu when clicking on a link
     const mobileNavLinks = mobileMenu.querySelectorAll('.mobile-nav-link');
     mobileNavLinks.forEach(link => {
       link.addEventListener('click', () => {
@@ -137,11 +121,48 @@ import { config } from '../config';
       });
     });
 
+    // Close menu on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && mobileMenu.classList.contains('active')) {
         mobileMenu.classList.remove('active');
         hamburgerToggle.setAttribute('aria-expanded', 'false');
         body.style.overflow = '';
+      }
+    });
+  }
+
+  // Search functionality
+  let searchData: any[] = [];
+  let searchOverlay: HTMLElement | null, searchInput: HTMLInputElement | null, searchResults: HTMLElement | null;
+
+  async function initSearch() {
+    try {
+      const response = await fetch(base + 'search.json');
+      searchData = await response.json();
+    } catch (error) {
+      console.error('Failed to load search data:', error);
+    }
+
+    searchOverlay = document.getElementById('search-overlay');
+    searchInput = document.getElementById('search-input') as HTMLInputElement;
+    searchResults = document.getElementById('search-results');
+
+    // Event listeners
+    document.getElementById('search-toggle')?.addEventListener('click', openSearch);
+    document.getElementById('search-close')?.addEventListener('click', closeSearch);
+    searchInput?.addEventListener('input', handleSearch);
+    
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchOverlay?.classList.contains('active')) {
+        closeSearch();
+      }
+    });
+    
+    // Close on overlay click
+    searchOverlay?.addEventListener('click', (e: Event) => {
+      if (e.target === searchOverlay) {
+        closeSearch();
       }
     });
   }
@@ -192,7 +213,7 @@ import { config } from '../config';
     const resultsHTML = results.map((post: any) => `
       <article class="search-result">
         <h3 class="search-result-title">
-          <a href="${post.url}">${post.title}</a>
+          <a href="${base}${post.url.startsWith('/') ? post.url.slice(1) : post.url}">${post.title}</a>
         </h3>
         <time class="search-result-date">${new Date(post.date).toLocaleDateString('en-US', {
           year: 'numeric',
@@ -218,6 +239,7 @@ import { config } from '../config';
     }
   }
 
+  // Initialize when DOM is loaded
   function init() {
     initHamburgerMenu();
     initSearch();
@@ -260,8 +282,8 @@ import { config } from '../config';
     height: 48px;
     width: auto;
     max-width: 280px;
-    border: none !important;
-    margin: 0 !important;
+    border: none !important; /* Override global img styles */
+    margin: 0 !important; /* Override global img styles */
   }
 
   .header-controls {
@@ -465,6 +487,19 @@ import { config } from '../config';
     color: white;
   }
 
+  /* Dark mode search category styles */
+  :global([data-theme="dark"]) .search-category {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+  }
+
+  :global([data-theme="dark"]) .search-category:hover {
+    background-color: var(--color-accent);
+    color: white;
+    border-color: var(--color-accent);
+  }
+
   .search-no-results {
     padding: calc(var(--grid-unit) * 10) calc(var(--grid-unit) * 6);
     text-align: center;
@@ -507,6 +542,12 @@ import { config } from '../config';
     text-decoration: none;
   }
 
+  .rss-link {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--grid-unit) / 2);
+  }
+
   .visually-hidden {
     position: absolute;
     width: 1px;
@@ -519,12 +560,14 @@ import { config } from '../config';
     border: 0;
   }
 
+  /* Desktop controls - visible by default */
   .mobile-controls {
     display: flex;
     align-items: center;
     gap: calc(var(--grid-unit) * 2);
   }
 
+  /* Hide mobile-only hamburger by default */
   .mobile-only {
     display: none !important;
   }
@@ -553,6 +596,39 @@ import { config } from '../config';
     justify-content: center;
     text-decoration: none;
   }
+  
+  .github-star-button {
+    background: none;
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    padding: calc(var(--grid-unit) * 0.75) calc(var(--grid-unit) * 2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--grid-unit));
+    text-decoration: none;
+    font-family: var(--font-heading-secondary);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.875rem;
+    border-radius: 4px;
+  }
+  
+  .github-star-button:hover,
+  .github-star-button:focus {
+    background-color: var(--color-accent);
+    color: var(--color-background);
+    outline: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .github-star-text {
+    display: inline-block;
+  }
 
   .hamburger-toggle:hover,
   .hamburger-toggle:focus,
@@ -562,6 +638,7 @@ import { config } from '../config';
     outline: none;
   }
 
+  /* Mobile menu - hidden by default */
   .mobile-menu {
     position: fixed;
     top: 0;
@@ -619,6 +696,7 @@ import { config } from '../config';
       padding: 0 calc(var(--grid-unit) * 2);
     }
 
+    /* Show mobile hamburger on far left */
     .mobile-only {
       display: flex !important;
       justify-self: start;
@@ -627,7 +705,7 @@ import { config } from '../config';
     .site-title {
       justify-self: center;
       text-align: center;
-      grid-column: 2;
+      grid-column: 2; /* Explicitly place in center column */
     }
 
     .site-title a {
@@ -643,13 +721,15 @@ import { config } from '../config';
     .header-controls {
       justify-self: end;
       gap: 0;
-      grid-column: 3;
+      grid-column: 3; /* Explicitly place in right column */
     }
     
+    /* Hide desktop navigation on mobile */
     .main-navigation {
       display: none;
     }
     
+    /* Show mobile controls on right */
     .mobile-controls {
       display: flex !important;
       gap: calc(var(--grid-unit) * 1.5);
@@ -679,13 +759,45 @@ import { config } from '../config';
       padding: calc(var(--grid-unit) * 2) calc(var(--grid-unit) * 2.5);
       margin: calc(var(--grid-unit) * -2) calc(var(--grid-unit) * -2.5) calc(var(--grid-unit) * 2) calc(var(--grid-unit) * -2.5);
     }
+    
+    .search-result-categories {
+      gap: calc(var(--grid-unit) * 2);
+    }
+    
+    .search-category {
+      padding: calc(var(--grid-unit)) calc(var(--grid-unit) * 2);
+    }
+    
+    .search-result-title {
+      margin-bottom: calc(var(--grid-unit) * 2);
+    }
+    
+    .search-result-date {
+      margin-bottom: calc(var(--grid-unit) * 3);
+    }
+    
+    .search-result-excerpt {
+      margin-bottom: calc(var(--grid-unit) * 4);
+    }
+    
+    /* Adjust GitHub button for mobile */
+    .github-star-button {
+      padding: calc(var(--grid-unit) * 0.75);
+      border-width: 1px;
+    }
+    
+    .github-star-text {
+      display: none;
+    }
   }
   
   @media (max-width: 480px) {
+    /* Even smaller mobile adjustments */
     .mobile-controls {
       gap: calc(var(--grid-unit)) !important;
     }
     
+    .github-star-button,
     .rss-toggle,
     .search-toggle {
       padding: calc(var(--grid-unit) * 0.5);

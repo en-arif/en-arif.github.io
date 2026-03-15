@@ -1,4 +1,3 @@
-// src/config.ts
 export interface SiteConfig {
   title: string;
   description: string;
@@ -18,24 +17,22 @@ export interface SiteConfig {
 }
 
 export const config: SiteConfig = {
-  title: "NUR ARIF",
-  description: "Programmer From Indonesia",
+  title: "Volks-Typo",
+  description: "A blog exploring the intersection of design, typography, and history",
   author: {
-    name: "Nur Arif",
-    bio: "Cyber Security Specialist | Pentester | Backend | Reverse Engineer | Python Programming",
-    avatar: "/favicon.svg",
+    name: "Your Name",
+    bio: "Writer, designer, and explorer of aesthetic tensions between past and present.",
+    // avatar: "/images/avatar.jpg" // Uncomment and add your avatar image to public/images/
   },
   social: {
-    github: "https://github.com/ArN-1",
-    twitter: "https://x.com/arifnrrrrr",
-    linkedin: "https://www.linkedin.com/in/nur-arif-8b6a521a4/",
-    email: "mailto:nurarifdev@gmail.com", // tambah mailto: agar bisa langsung jadi link
+    github: "https://github.com/yourusername",
+    twitter: "https://twitter.com/yourusername",
+    linkedin: "https://linkedin.com/in/yourusername",
+    email: "your.email@example.com"
   },
-  siteUrl: "https://www.nurarif.com",
+  siteUrl: "https://volks-typo.example.com"
 };
 
-// Export constants untuk SEO component
+// Export constants for SEO component
 export const SITE_TITLE = config.title;
 export const SITE_DESCRIPTION = config.description;
-export const SITE_URL = config.siteUrl;
-export const SITE_AUTHOR = config.author.name;

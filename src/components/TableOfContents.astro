@@ -9,127 +9,52 @@ const { headings } = Astro.props;
 ---
 
 {headings.length > 0 && (
-  <div class="toc-wrapper">
-    <button class="toc-fab" aria-expanded="false" aria-controls="toc-panel" title="Table of Contents">
-      <svg width="20" height="20" viewBox="0 0 16 16" fill="none">
-        <rect x="1" y="2" width="14" height="2" rx="1" fill="currentColor"/>
-        <rect x="1" y="7" width="10" height="2" rx="1" fill="currentColor"/>
-        <rect x="1" y="12" width="12" height="2" rx="1" fill="currentColor"/>
-      </svg>
-    </button>
-
-    <nav class="toc-panel" id="toc-panel" hidden>
-      <p class="toc-heading">
-        Table of Contents
-        <button class="toc-close" aria-label="Close">✕</button>
-      </p>
-      <ol class="toc-list">
-        {headings.map(heading => (
-          <li class={`toc-item toc-level-${heading.depth}`}>
-            <a href={`#${heading.slug}`} class="toc-link">{heading.text}</a>
-          </li>
-        ))}
-      </ol>
-    </nav>
-  </div>
+  <nav class="table-of-contents">
+    <h2 class="toc-title">Table of Contents</h2>
+    <ol class="toc-list">
+      {headings.map(heading => (
+        <li class={`toc-item toc-level-${heading.depth}`}>
+          <a href={`#${heading.slug}`} class="toc-link">
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
 )}
 
 <style>
-  /* FAB fixed pojok kanan bawah */
-  .toc-fab {
-    position: fixed;
-    bottom: 28px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: var(--color-accent);
-    color: white;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-    z-index: 100;
-    transition: transform 0.2s ease, background-color 0.2s ease;
-  }
-
-  .toc-fab:hover {
-    transform: scale(1.1);
-  }
-
-  /* Panel muncul di atas FAB */
-  .toc-panel {
-    position: fixed;
-    bottom: 88px;
-    right: 24px;
-    width: 260px;
+  .table-of-contents {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    z-index: 99;
-    overflow: hidden;
-    animation: toc-open 0.2s ease forwards;
+    border-radius: 8px;
+    padding: calc(var(--grid-unit) * 3);
+    margin-bottom: calc(var(--grid-unit) * 4);
   }
 
-  .toc-panel[hidden] { display: none; }
-
-  @keyframes toc-open {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .toc-heading {
+  .toc-title {
     font-family: var(--font-heading-secondary);
-    font-size: 0.8rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-accent);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin: 0;
-    padding: calc(var(--grid-unit) * 1.5) calc(var(--grid-unit) * 2);
+    letter-spacing: 0.05em;
+    margin-bottom: calc(var(--grid-unit) * 2);
+    padding-bottom: calc(var(--grid-unit));
     border-bottom: 2px solid var(--color-accent);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
-
-  .toc-close {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-muted);
-    font-size: 0.9rem;
-    padding: 0;
-    line-height: 1;
-    transition: color 0.15s ease;
-  }
-
-  .toc-close:hover { color: var(--color-accent); }
 
   .toc-list {
     margin: 0;
-    padding: calc(var(--grid-unit)) calc(var(--grid-unit) * 2) calc(var(--grid-unit) * 1.5);
+    padding: 0;
     list-style: none;
     counter-reset: toc-counter;
-    max-height: 50vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) transparent;
-  }
-
-  .toc-list::-webkit-scrollbar { width: 3px; }
-  .toc-list::-webkit-scrollbar-thumb {
-    background-color: var(--color-border);
-    border-radius: 3px;
   }
 
   .toc-item {
+    margin-bottom: calc(var(--grid-unit));
     counter-increment: toc-counter;
     position: relative;
-    margin-bottom: 2px;
   }
 
   .toc-item::before {
@@ -137,80 +62,118 @@ const { headings } = Astro.props;
     position: absolute;
     left: 0;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.9rem;
     color: var(--color-text-muted);
     font-weight: 600;
-    line-height: 1.7;
   }
 
   .toc-link {
     display: block;
-    padding: 3px 0 3px calc(var(--grid-unit) * 2.5);
+    padding-left: calc(var(--grid-unit) * 3);
     color: var(--color-text-primary);
     text-decoration: none;
-    font-size: 0.85rem;
     line-height: 1.6;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
   }
 
-  .toc-link:hover { color: var(--color-accent); }
+  .toc-link:hover,
+  .toc-link:focus {
+    color: var(--color-accent);
+    transform: translateX(4px);
+  }
 
+  /* Indent for h3 items */
+  .toc-level-3 {
+    margin-left: calc(var(--grid-unit) * 2);
+  }
+
+  .toc-level-3 .toc-link {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+  }
+
+  .toc-level-3 .toc-link:hover,
+  .toc-level-3 .toc-link:focus {
+    color: var(--color-accent);
+  }
+
+  @media (max-width: 768px) {
+    .table-of-contents {
+      padding: calc(var(--grid-unit) * 2);
+    }
+
+    .toc-title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<script>
+  // Add smooth scrolling and highlight active section
+  document.addEventListener('DOMContentLoaded', () => {
+    const tocLinks = document.querySelectorAll('.toc-link');
+    
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.slice(1);
+        const targetElement = targetId ? document.getElementById(targetId) : null;
+        
+        if (targetElement) {
+          targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+          
+          // Update URL without jumping
+          history.pushState(null, '', `#${targetId}`);
+        }
+      });
+    });
+
+    // Highlight current section on scroll
+    const observerOptions = {
+      rootMargin: '-20% 0px -70% 0px'
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        const id = entry.target.getAttribute('id');
+        const tocLink = document.querySelector(`.toc-link[href="#${id}"]`);
+        
+        if (tocLink) {
+          if (entry.isIntersecting) {
+            // Remove all active classes
+            document.querySelectorAll('.toc-link').forEach(link => {
+              link.classList.remove('active');
+            });
+            // Add active class to current link
+            tocLink.classList.add('active');
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    // Observe all headings
+    document.querySelectorAll('h2[id], h3[id]').forEach(heading => {
+      observer.observe(heading);
+    });
+  });
+</script>
+
+<style>
   .toc-link.active {
     color: var(--color-accent);
     font-weight: 600;
   }
 
-  .toc-level-3 { margin-left: calc(var(--grid-unit) * 1.5); }
-
-  .toc-level-3 .toc-link {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
+  .toc-link.active::after {
+    content: "•";
+    position: absolute;
+    right: 0;
+    color: var(--color-accent);
+    font-size: 1.2rem;
   }
 </style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const fab = document.querySelector('.toc-fab') as HTMLButtonElement;
-    const panel = document.getElementById('toc-panel');
-    const closeBtn = document.querySelector('.toc-close') as HTMLButtonElement;
-
-    const open  = () => { fab.setAttribute('aria-expanded', 'true');  panel!.hidden = false; };
-    const close = () => { fab.setAttribute('aria-expanded', 'false'); panel!.hidden = true;  };
-    const toggle = () => fab.getAttribute('aria-expanded') === 'true' ? close() : open();
-
-    fab.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
-    closeBtn?.addEventListener('click', close);
-
-    document.addEventListener('click', (e) => {
-      if (!fab.contains(e.target as Node) && !panel!.contains(e.target as Node)) close();
-    });
-
-    document.querySelectorAll('.toc-link').forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href')?.slice(1);
-        const target = targetId ? document.getElementById(targetId) : null;
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          history.pushState(null, '', `#${targetId}`);
-          close();
-        }
-      });
-    });
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const id = entry.target.getAttribute('id');
-            document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
-            document.querySelector(`.toc-link[href="#${id}"]`)?.classList.add('active');
-          }
-        });
-      },
-      { rootMargin: '-20% 0px -70% 0px' }
-    );
-
-    document.querySelectorAll('h2[id], h3[id]').forEach(h => observer.observe(h));
-  });
-</script>
