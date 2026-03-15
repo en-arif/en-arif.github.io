@@ -4,6 +4,15 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,10 +22,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: 'npm'
 
-      - run: npm install
+      - run: npm ci
 
-      - run: npm run build
+      - name: Build
+        run: npm run build
+        env:
+          SITE: https://www.nurarif.com
+          BASE_PATH: /
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -25,9 +39,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
